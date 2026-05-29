@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DEEP404 — El futuro que siempre fue</title>
+<link rel="icon" type="image/x-icon" href="Assets/gato.ico">
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+@font-face {
+  font-family: 'VCR';
+  src: local('VCR OSD Mono');
+}
+</style>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+:root {
+  --green: #39ff6a;
+  --green-dim: #1a8c3a;
+  --green-dark: #0d3d1a;
+  --black: #000000;
+  --bg: #040804;
+  --gray: #4a4a4a;
+  --gray-light: #8a8a8a;
+  --white-dirty: #d8d4c8;
+  --red: #cc2200;
+  --red-bright: #ff2200;
+  --border: #1a3d1a;
+  --font-title: 'VCR OSD Mono', 'VT323', monospace;
+  --font-body: 'Courier Prime', 'Courier New', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--white-dirty);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* SCANLINES */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(0,0,0,0.08) 3px,
+    rgba(0,0,0,0.08) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ── BOOT SCREEN ── */
+#boot {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-title);
+  color: var(--green);
+  transition: opacity 0.8s ease;
+}
+#boot.hide { opacity: 0; pointer-events: none; }
+#boot-text { font-size: 13px; letter-spacing: 0.1em; max-width: 480px; }
+#boot-text p { margin-bottom: 4px; }
+#boot-text .ok { color: var(--green); }
+#boot-text .warn { color: var(--red); }
+#boot-bar-wrap { margin-top: 24px; width: 320px; }
+#boot-bar-label { font-size: 11px; color: var(--green-dim); margin-bottom: 6px; }
+#boot-bar { height: 4px; background: var(--green-dark); width: 100%; }
+#boot-bar-fill { height: 100%; background: var(--green); width: 0%; transition: width 0.05s linear; }
+#boot-logo { font-family: 'VCR OSD Mono', 'VT323', monospace; font-size: 52px; letter-spacing: 0.18em; margin-bottom: 40px; color: #39ff6a; text-shadow: 0 0 12px rgba(57,255,106,0.5); }
+
+/* ── STICKY NAV ── */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(4,8,4,0.96);
+  border-bottom: 1px solid var(--border);
+  padding: 0 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+}
+.nav-brand {
+  font-family: 'VCR OSD Mono', 'VT323', monospace;
+  font-size: 20px;
+  color: #39ff6a;
+  letter-spacing: 0.12em;
+  text-decoration: none;
+  text-shadow: 0 0 8px rgba(57,255,106,0.4);
+}
+.nav-links { display: flex; gap: 0; }
+.nav-links a {
+  font-family: var(--font-title);
+  font-size: 11px;
+  color: var(--gray-light);
+  text-decoration: none;
+  letter-spacing: 0.12em;
+  padding: 0 16px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  border-left: 1px solid var(--border);
+  transition: color 0.2s, background 0.2s;
+}
+.nav-links a:hover { color: var(--green); background: rgba(57,255,106,0.04); }
+.nav-links a.secret { color: var(--red); opacity: 0.4; }
+.nav-links a.secret:hover { opacity: 1; }
+.nav-signal {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-title); font-size: 11px; color: var(--green-dim);
+}
+.signal-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: blink 1.4s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.1} }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 80px 40px 60px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+.hero-eyebrow {
+  font-family: var(--font-title);
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  color: var(--green-dim);
+  margin-bottom: 20px;
+}
+.hero-eyebrow span { color: var(--red); }
+.hero h1 {
+  font-family: 'VCR OSD Mono', 'VT323', monospace;
+  font-size: clamp(60px, 13vw, 140px);
+  line-height: 0.88;
+  letter-spacing: 0.08em;
+  color: var(--green);
+  margin-bottom: 12px;
+  position: relative;
+  text-shadow: 0 0 16px rgba(57,255,106,0.35);
+}
+.hero h1 .deep { display: block; }
+.hero h1 .fourofour {
+  display: block;
+  color: var(--white-dirty);
+  text-shadow: 2px 0 0 var(--green);
+  animation: titleglitch 6s infinite;
+}
+@keyframes titleglitch {
+  0%,89%,100%{ text-shadow: 2px 0 0 var(--green); transform: translate(0); }
+  90%{ text-shadow: -3px 0 0 var(--red), 3px 0 0 var(--green); transform: translate(-2px,0); }
+  92%{ text-shadow: 3px 0 0 var(--red), -3px 0 0 var(--green); transform: translate(2px,0); }
+  94%{ text-shadow: 2px 0 0 var(--green); transform: translate(0); }
+}
+.hero-sub {
+  font-family: var(--font-title);
+  font-size: clamp(13px, 2vw, 18px);
+  color: var(--green-dim);
+  letter-spacing: 0.08em;
+  margin-bottom: 48px;
+  font-style: normal;
+}
+.hero-desc {
+  max-width: 560px;
+  font-size: 14px;
+  color: var(--gray-light);
+  line-height: 1.8;
+  border-left: 2px solid var(--green-dark);
+  padding-left: 20px;
+  margin-bottom: 48px;
+}
+.hero-meta {
+  display: flex;
+  gap: 32px;
+  font-family: var(--font-title);
+  font-size: 11px;
+  color: var(--gray);
+  letter-spacing: 0.1em;
+  flex-wrap: wrap;
+}
+.hero-meta .meta-item strong {
+  display: block;
+  color: var(--green-dim);
+  margin-bottom: 2px;
+}
+.hero-coords {
+  position: absolute;
+  bottom: 30px; right: 40px;
+  font-family: var(--font-title);
+  font-size: 10px;
+  color: var(--border);
+  letter-spacing: 0.1em;
+  text-align: right;
+}
+
+/* ── SECTION BASE ── */
+section {
+  border-bottom: 1px solid var(--border);
+}
+.section-header {
+  padding: 20px 40px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+}
+.section-num {
+  font-family: var(--font-title);
+  font-size: 11px;
+  color: var(--green-dim);
+  letter-spacing: 0.2em;
+}
+.section-title {
+  font-family: var(--font-title);
+  font-size: 13px;
+  color: var(--green);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.section-body { padding: 40px; }
+
+/* ── TEASER VIDEO ── */
+.teaser-wrap {
+  position: relative;
+  background: #000;
+  border: 1px solid var(--border);
+}
+.video-placeholder {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: var(--green-dim);
+  font-family: var(--font-title);
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  border: 1px solid var(--green-dark);
+}
+.video-placeholder iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+.play-icon {
+  width: 56px; height: 56px;
+  border: 2px solid var(--green-dim);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; color: var(--green-dim);
+}
+.video-embed-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: #000;
+}
+.video-embed-container iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+.video-caption {
+  padding: 12px 16px;
+  font-family: var(--font-title);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--gray);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+}
+.video-caption .vc-status { color: var(--green-dim); }
+
+/* ── ENTREVISTAS ── */
+.interviews-intro {
+  font-size: 13px;
+  color: var(--gray-light);
+  margin-bottom: 32px;
+  font-family: var(--font-title);
+  letter-spacing: 0.08em;
+}
+.interviews-intro strong { color: var(--green); }
+.filter-bar {
+  display: flex;
+  gap: 0;
+  margin-bottom: 32px;
+  border: 1px solid var(--border);
+  width: fit-content;
+}
+.filter-btn {
+  font-family: var(--font-title);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  padding: 8px 20px;
+  border: none;
+  background: transparent;
+  color: var(--gray);
+  cursor: pointer;
+  border-right: 1px solid var(--border);
+  transition: all 0.15s;
+}
+.filter-btn:last-child { border-right: none; }
+.filter-btn.active, .filter-btn:hover { background: var(--green-dark); color: var(--green); }
+.interviews-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+.interview-card {
+  background: var(--bg);
+  padding: 0;
+  cursor: pointer;
+  transition: background 0.15s;
+  display: flex;
+  flex-direction: column;
+}
+.interview-card:hover { background: #060e06; }
+.card-thumb {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: #000;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.card-thumb-inner {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #010601 0%, #040d04 100%);
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-title);
+  font-size: 28px;
+  color: var(--green-dark);
+  letter-spacing: 0.3em;
+  position: relative;
+}
+.card-thumb-inner.has-thumb { color: transparent; }
+.card-thumb-inner.has-thumb::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 1;
+}
+.card-thumb-inner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.2) 2px,rgba(0,0,0,0.2) 3px);
+  z-index: 2;
+}
+.card-play { z-index: 3; }
+.card-play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+  background: rgba(0,0,0,0.5);
+}
+.interview-card:hover .card-play { opacity: 1; }
+.card-play span {
+  width: 40px; height: 40px;
+  border: 1px solid var(--green);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--green);
+  font-size: 14px;
+}
+.card-body { padding: 14px 16px; flex: 1; }
+.card-num {
+  font-family: var(--font-title);
+  font-size: 10px;
+  color: var(--green-dim);
+  letter-spacing: 0.2em;
+  margin-bottom: 4px;
+}
+.card-name {
+  font-family: var(--font-title);
+  font-size: 13px;
+  color: var(--white-dirty);
+  margin-bottom: 4px;
+  letter-spacing: 0.05em;
+}
+.card-role {
+  font-size: 11px;
+  color: var(--gray);
+  letter-spacing: 0.05em;
+}
+.card-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  font-family: var(--font-title);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  margin-top: 10px;
+  border: 1px solid var(--green-dark);
+  color: var(--green-dim);
+}
+
+/* ── VIDEO MODAL ── */
+#modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.92);
+  z-index: 5000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+#modal-overlay.open { display: flex; }
+#modal-box {
+  width: 100%;
+  max-width: 900px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+}
+#modal-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-title);
+  font-size: 11px;
+  color: var(--green-dim);
+}
+#modal-close {
+  background: none; border: none;
+  color: var(--gray); cursor: pointer;
+  font-family: var(--font-title); font-size: 13px;
+  letter-spacing: 0.1em;
+}
+#modal-close:hover { color: var(--red); }
+#modal-video-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: #000;
+}
+#modal-video-wrap iframe {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%; border: none;
+}
+#modal-info {
+  padding: 16px;
+  border-top: 1px solid var(--border);
+  font-family: var(--font-title);
+}
+#modal-name { font-size: 14px; color: var(--green); letter-spacing: 0.1em; margin-bottom: 4px; }
+#modal-role { font-size: 11px; color: var(--gray-light); letter-spacing: 0.08em; }
+#modal-placeholder {
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 12px;
+  font-family: var(--font-title); font-size: 12px;
+  color: var(--green-dim); letter-spacing: 0.15em;
+  text-align: center; padding: 20px;
+}
+#modal-placeholder .drive-url {
+  margin-top: 12px;
+  font-size: 11px;
+  color: var(--gray);
+  word-break: break-all;
+  background: #000;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  max-width: 500px;
+}
+
+/* ── ACCESO RESTRINGIDO (SECCIÓN OCULTA) ── */
+#restricted {
+  background: var(--bg);
+}
+.restricted-gate {
+  padding: 60px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 24px;
+}
+.restricted-icon {
+  font-family: var(--font-title);
+  font-size: 48px;
+  color: var(--red);
+  letter-spacing: 0.1em;
+  animation: blink 2s infinite;
+}
+.restricted-title {
+  font-family: var(--font-title);
+  font-size: 18px;
+  color: var(--red);
+  letter-spacing: 0.2em;
+}
+.restricted-desc {
+  font-family: var(--font-title);
+  font-size: 12px;
+  color: var(--gray);
+  letter-spacing: 0.1em;
+  max-width: 400px;
+  line-height: 1.8;
+}
+.access-form {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--border);
+}
+#access-input {
+  background: #000;
+  border: none;
+  outline: none;
+  padding: 12px 16px;
+  font-family: var(--font-title);
+  font-size: 13px;
+  color: var(--green);
+  letter-spacing: 0.15em;
+  width: 220px;
+}
+#access-input::placeholder { color: var(--border); }
+#access-btn {
+  background: var(--green-dark);
+  border: none;
+  border-left: 1px solid var(--border);
+  color: var(--green);
+  font-family: var(--font-title);
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+#access-btn:hover { background: var(--green); color: var(--black); }
+#access-error {
+  font-family: var(--font-title);
+  font-size: 11px;
+  color: var(--red);
+  letter-spacing: 0.1em;
+  min-height: 16px;
+}
+#restricted-content {
+  display: none;
+  padding: 40px;
+}
+#restricted-content.open { display: block; }
+.docs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 24px;
+}
+.doc-card {
+  border: 1px solid var(--border);
+  padding: 24px;
+  background: #000;
+  transition: border-color 0.2s;
+}
+.doc-card:hover { border-color: var(--green-dark); }
+.doc-type {
+  font-family: var(--font-title);
+  font-size: 10px;
+  color: var(--red);
+  letter-spacing: 0.25em;
+  margin-bottom: 12px;
+}
+.doc-title {
+  font-family: var(--font-title);
+  font-size: 15px;
+  color: var(--white-dirty);
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+.doc-desc {
+  font-size: 12px;
+  color: var(--gray);
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+.doc-link {
+  font-family: var(--font-title);
+  font-size: 11px;
+  color: var(--green-dim);
+  letter-spacing: 0.12em;
+  text-decoration: none;
+  border-bottom: 1px solid var(--green-dark);
+  padding-bottom: 2px;
+  transition: color 0.15s;
+}
+.doc-link:hover { color: var(--green); }
+
+/* ── PROGRAMAS ── */
+#programas { border-bottom: 1px solid var(--border); }
+.prog-intro {
+  font-family: var(--font-title);
+  font-size: 12px;
+  color: var(--gray);
+  letter-spacing: 0.1em;
+  line-height: 1.9;
+  margin-bottom: 40px;
+  max-width: 640px;
+}
+.prog-intro strong { color: var(--green-dim); }
+.prog-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  margin-bottom: 40px;
+}
+.prog-card {
+  background: var(--bg);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.prog-card-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+.prog-icon {
+  width: 48px; height: 48px;
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-title);
+  font-size: 18px;
+  color: var(--green);
+  flex-shrink: 0;
+  background: #000;
+  letter-spacing: 0;
+}
+.prog-icon.virus { color: var(--red); border-color: var(--red); }
+.prog-header-text { flex: 1; }
+.prog-type {
+  font-family: var(--font-title);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--green-dim);
+  margin-bottom: 4px;
+}
+.prog-type.virus-type { color: var(--red); }
+.prog-name {
+  font-family: var(--font-title);
+  font-size: 18px;
+  color: var(--white-dirty);
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+}
+.prog-body { padding: 20px 24px; flex: 1; }
+.prog-desc {
+  font-size: 13px;
+  color: var(--gray-light);
+  line-height: 1.8;
+  margin-bottom: 20px;
+}
+.prog-specs {
+  font-family: var(--font-title);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  margin-bottom: 20px;
+}
+.prog-spec-row {
+  display: flex;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  align-items: baseline;
+}
+.prog-spec-key { color: var(--green-dim); flex-shrink: 0; min-width: 100px; }
+.prog-spec-key.red { color: var(--red); }
+.prog-spec-val { color: var(--gray-light); }
+.prog-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.prog-btn {
+  font-family: var(--font-title);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  padding: 8px 16px;
+  text-decoration: none;
+  border: 1px solid var(--green-dark);
+  color: var(--green-dim);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.prog-btn:hover { background: var(--green-dark); color: var(--green); }
+.prog-btn.danger { border-color: var(--red); color: var(--red); opacity: 0.7; }
+.prog-btn.danger:hover { background: rgba(204,34,0,0.15); opacity: 1; }
+.prog-status {
+  font-family: var(--font-title);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+}
+.prog-status.pending { color: var(--gray); border-color: var(--border); }
+.prog-status.active { color: var(--green); border-color: var(--green-dark); animation: blink 2s infinite; }
+
+/* Behaviour demo strip */
+.prog-behavior {
+  margin: 0 24px 20px;
+  border: 1px solid var(--border);
+  background: #000;
+  padding: 14px 16px;
+  font-family: var(--font-title);
+  font-size: 11px;
+  color: var(--green-dim);
+  letter-spacing: 0.08em;
+  line-height: 1.9;
+}
+.prog-behavior .step { display: flex; gap: 10px; }
+.prog-behavior .step-num { color: var(--border); flex-shrink: 0; }
+.prog-behavior .step-txt { color: var(--gray-light); }
+.prog-behavior .step-txt.red { color: var(--red); }
+.prog-behavior .step-txt.green { color: var(--green); }
+
+/* Reddit strip */
+.reddit-strip {
+  border: 1px solid var(--border);
+  background: #000;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px 24px;
+  text-decoration: none;
+  transition: border-color 0.2s;
+  margin-top: 8px;
+}
+.reddit-strip:hover { border-color: var(--green-dark); }
+.reddit-icon {
+  font-family: var(--font-title);
+  font-size: 28px;
+  color: var(--red);
+  flex-shrink: 0;
+  letter-spacing: 0;
+}
+.reddit-text { flex: 1; }
+.reddit-label {
+  font-family: var(--font-title);
+  font-size: 10px;
+  color: var(--red);
+  letter-spacing: 0.2em;
+  margin-bottom: 4px;
+}
+.reddit-title {
+  font-family: var(--font-title);
+  font-size: 14px;
+  color: var(--white-dirty);
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+.reddit-desc {
+  font-family: var(--font-title);
+  font-size: 11px;
+  color: var(--gray);
+  letter-spacing: 0.06em;
+}
+.reddit-arrow {
+  font-family: var(--font-title);
+  font-size: 18px;
+  color: var(--green-dim);
+}
+
+/* ── ABOUT ── */
+.about-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
+.about-text { font-size: 14px; color: var(--gray-light); line-height: 1.9; }
+.about-text p { margin-bottom: 16px; }
+.about-specs { font-family: var(--font-title); font-size: 11px; }
+.spec-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  gap: 16px;
+}
+.spec-key { color: var(--green-dim); letter-spacing: 0.1em; flex-shrink: 0; }
+.spec-val { color: var(--white-dirty); text-align: right; }
+
+/* ── FOOTER ── */
+footer {
+  padding: 24px 40px;
+  font-family: var(--font-title);
+  font-size: 10px;
+  color: var(--border);
+  letter-spacing: 0.12em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+footer .footer-brand { color: var(--green-dark); font-size: 12px; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  nav { padding: 0 20px; }
+  .nav-links a { padding: 0 10px; font-size: 10px; }
+  .hero { padding: 60px 20px 40px; }
+  .section-body { padding: 24px 20px; }
+  .section-header { padding: 16px 20px; }
+  .about-grid { grid-template-columns: 1fr; }
+  .docs-grid { grid-template-columns: 1fr; }
+  footer { flex-direction: column; gap: 8px; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- BOOT SCREEN -->
+<div id="boot">
+  <div id="boot-logo">DEEP404</div>
+  <div id="boot-text">
+    <p class="ok">INICIALIZANDO SISTEMA DE ARCHIVO...</p>
+    <p class="ok">CARGANDO MÓDULOS DE VIGILANCIA... [OK]</p>
+    <p class="ok">VERIFICANDO INTEGRIDAD DE DATOS... [OK]</p>
+    <p class="warn">ADVERTENCIA: ACCESO MONITOREADO</p>
+    <p class="warn">ESTE SISTEMA REGISTRA TODAS LAS SESIONES</p>
+  </div>
+  <div id="boot-bar-wrap">
+    <div id="boot-bar-label">CARGANDO ARCHIVOS... <span id="boot-pct">0</span>%</div>
+    <div id="boot-bar"><div id="boot-bar-fill"></div></div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-brand">DEEP404</a>
+  <div class="nav-links">
+    <a href="#teaser">// TEASER</a>
+    <a href="#entrevistas">// ENTREVISTAS</a>
+    <a href="#programas">// PROGRAMAS</a>
+    <a href="#proyecto">// PROYECTO</a>
+    <a href="#restricted" class="secret">// ACCESO_RESTRINGIDO</a>
+  </div>
+  <div class="nav-signal">
+    <div class="signal-dot"></div>
+    <span>SEÑAL ACTIVA</span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="inicio">
+  <div class="hero-eyebrow">ARCHIVO_PÚBLICO &nbsp;|&nbsp; <span>CLASIFICACIÓN: ABIERTO</span> &nbsp;|&nbsp; REG-2026</div>
+  <h1>
+    <span class="deep">DEEP</span>
+    <span class="fourofour">404</span>
+  </h1>
+  <div class="hero-sub">EL FUTURO QUE SIEMPRE FUE &nbsp;/&nbsp; UN FALSO DOCUMENTAL DISTÓPICO</div>
+  <div class="hero-desc">
+    Un sistema de algoritmos de aprendizaje autónomo controla los medios de comunicación.
+    Lo que usted está a punto de ver fue encontrado en los archivos. No sabemos si es real.
+    No sabemos si importa. El sistema decidirá.
+  </div>
+  <div class="hero-meta">
+    <div class="meta-item">
+      <strong>FORMATO</strong>
+      FALSO DOCUMENTAL / TEASER
+    </div>
+    <div class="meta-item">
+      <strong>ORIGEN</strong>
+      BOGOTÁ D.C. — 2026
+    </div>
+    <div class="meta-item">
+      <strong>ENTREVISTAS</strong>
+      24 REGISTROS
+    </div>
+    <div class="meta-item">
+      <strong>ESTADO</strong>
+      <span style="color:var(--green)">EN DISTRIBUCIÓN</span>
+    </div>
+  </div>
+  <div class="hero-coords">
+    LAT: 4.6097° N &nbsp;|&nbsp; LON: 74.0817° W<br>
+    TIMESTAMP: 2026.06.XX &nbsp;|&nbsp; SIG: DEEP404-UD
+  </div>
+</section>
+
+<!-- TEASER -->
+<section id="teaser">
+  <div class="section-header">
+    <span class="section-num">01 //</span>
+    <span class="section-title">TEASER — TRANSMISIÓN PRINCIPAL</span>
+  </div>
+  <div class="section-body">
+    <div class="teaser-wrap">
+      <div class="video-embed-container">
+        <!-- 
+          INSTRUCCIONES: Reemplaza el src del iframe con tu enlace de Google Drive
+          Formato: https://drive.google.com/file/d/TU_ID_AQUI/preview
+          O con YouTube: https://www.youtube.com/embed/TU_VIDEO_ID
+        -->
+        <div class="video-placeholder" id="teaser-placeholder" style="position:absolute;inset:0;z-index:2;"></div>
+        <iframe id="teaser-iframe" 
+          src="about:blank"
+          allow="autoplay; fullscreen"
+          allowfullscreen
+          style="display:none;">
+        </iframe>
+      </div>
+      <div class="video-caption">
+        <span class="vc-status">&#9679; ARCHIVO PRINCIPAL</span>
+        <span>DEEP404 / FALSO DOCUMENTAL / 2026 / BOGOTÁ D.C.</span>
+      </div>
+    </div>
+    <div style="margin-top:24px; font-family:var(--font-title); font-size:11px; color:var(--gray); letter-spacing:0.1em; line-height:1.8; max-width:640px;">
+      <p style="color:var(--green-dim); margin-bottom:8px;">// NOTA DEL SISTEMA</p>
+      <p>Este archivo contiene el teaser de DEEP404, una preconcepción de falso documental distópico sobre la relación entre inteligencia artificial, algoritmos de aprendizaje autónomo y el control mediático en Latinoamérica. Trabajo de grado — Universidad Distrital Francisco José de Caldas, 2026.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ENTREVISTAS -->
+<section id="entrevistas">
+  <div class="section-header">
+    <span class="section-num">02 //</span>
+    <span class="section-title">REGISTROS DE ENTREVISTAS — 24 ARCHIVOS</span>
+  </div>
+  <div class="section-body">
+    <div class="interviews-intro">
+      TOTAL DE REGISTROS: <strong>24</strong> &nbsp;|&nbsp; ESTADO: CLASIFICADO PÚBLICO &nbsp;|&nbsp; FUENTE: GOOGLE DRIVE
+    </div>
+
+    <div class="interviews-grid" id="grid">
+
+      <!-- Tarjetas de entrevista generadas dinámicamente por JS -->
+      <!-- Agrega o edita los datos en el array "entrevistas" en el script -->
+
+    </div>
+  </div>
+</section>
+
+<!-- PROYECTO -->
+<section id="proyecto">
+  <div class="section-header">
+    <span class="section-num">05 //</span>
+    <span class="section-title">SOBRE EL PROYECTO</span>
+  </div>
+  <div class="section-body">
+    <div class="about-grid">
+      <div class="about-text">
+        <p>DEEP404 es la preconcepción inicial de un falso documental distópico sobre la relación entre distopía e inteligencia artificial. El proyecto explora cómo los algoritmos de aprendizaje autónomo podrían controlar los medios de comunicación y manipular la percepción de la realidad.</p>
+        <p>La narrativa se desarrolla en un futuro distópico ambientado en Bogotá, utilizando el formato del falso documental para sumergir al espectador en una realidad fabricada: entrevistas simuladas con "expertos", grabaciones de archivo alteradas y testimonios de personajes ficticios.</p>
+        <p>El proyecto no es ciencia ficción espectacular. Es una advertencia. Un espejo del presente. Una simulación creíble.</p>
+      </div>
+      <div class="about-specs">
+        <div class="spec-row"><span class="spec-key">GÉNERO</span><span class="spec-val">FALSO DOCUMENTAL</span></div>
+        <div class="spec-row"><span class="spec-key">SUBGÉNERO</span><span class="spec-val">DISTOPÍA / IA</span></div>
+        <div class="spec-row"><span class="spec-key">AUTOR</span><span class="spec-val">J.C. MAYORGA TRIANA</span></div>
+        <div class="spec-row"><span class="spec-key">TUTORA</span><span class="spec-val">L.M. LEÓN ACUÑA</span></div>
+        <div class="spec-row"><span class="spec-key">INSTITUCIÓN</span><span class="spec-val">UD FJC — 2026</span></div>
+        <div class="spec-row"><span class="spec-key">ENTREVISTAS</span><span class="spec-val">24 REGISTROS</span></div>
+        <div class="spec-row"><span class="spec-key">ESTADO</span><span class="spec-val" style="color:var(--green)">ACTIVO</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ACCESO RESTRINGIDO -->
+<section id="restricted">
+  <div class="section-header">
+    <span class="section-num" style="color:var(--red)">// //</span>
+    <span class="section-title" style="color:var(--red)">ACCESO RESTRINGIDO — ARCHIVOS DE PRODUCCIÓN</span>
+  </div>
+
+  <div class="restricted-gate" id="gate">
+    <div class="restricted-icon">[ ERROR_403 ]</div>
+    <div class="restricted-title">ÁREA DE ACCESO LIMITADO</div>
+    <div class="restricted-desc">
+      Este sector contiene material de preproducción interno:<br>
+      guion literario, guion técnico y storyboard de DEEP404.<br>
+      Se requiere código de autorización para continuar.
+    </div>
+    <div class="access-form">
+      <input type="password" id="access-input" placeholder="CÓDIGO DE ACCESO" maxlength="24" autocomplete="off" />
+      <button id="access-btn" onclick="checkAccess()">INGRESAR</button>
+    </div>
+    <div id="access-error"></div>
+    <div style="font-family:var(--font-title);font-size:10px;color:var(--border);letter-spacing:0.1em;margin-top:8px;">
+      PISTA: EL TÍTULO DEL PROYECTO EN MINÚSCULAS
+    </div>
+  </div>
+
+  <div id="restricted-content">
+    <div style="font-family:var(--font-title);font-size:11px;color:var(--green-dim);letter-spacing:0.15em;margin-bottom:8px;">
+      // ACCESO CONCEDIDO — MOSTRANDO ARCHIVOS INTERNOS
+    </div>
+    <div style="font-family:var(--font-title);font-size:10px;color:var(--gray);letter-spacing:0.1em;margin-bottom:32px;">
+      ADVERTENCIA: ESTE MATERIAL ES PARTE DEL TRABAJO DE GRADO. DISTRIBUCIÓN RESTRINGIDA.
+    </div>
+
+    <!-- BLOQUE ACADÉMICO -->
+    <div style="border:1px solid var(--border); margin-bottom:32px; background:#000;">
+
+      <!-- TÍTULO -->
+      <div style="border-bottom:1px solid var(--border); padding:16px 24px; display:flex; gap:16px; align-items:baseline;">
+        <span style="font-family:var(--font-title);font-size:10px;color:var(--green-dim);letter-spacing:0.2em;flex-shrink:0;">TÍTULO //</span>
+        <span style="font-family:var(--font-title);font-size:14px;color:var(--white-dirty);letter-spacing:0.06em;line-height:1.5;">
+          Deep 404: La preconcepción de un falso documental sobre el futuro que siempre fue
+        </span>
+      </div>
+
+      <!-- TEMA -->
+      <div style="border-bottom:1px solid var(--border); padding:16px 24px; display:flex; gap:16px; align-items:baseline;">
+        <span style="font-family:var(--font-title);font-size:10px;color:var(--green-dim);letter-spacing:0.2em;flex-shrink:0;">TEMA &nbsp;&nbsp;&nbsp;//</span>
+        <span style="font-family:var(--font-title);font-size:13px;color:var(--gray-light);letter-spacing:0.06em;line-height:1.6;">
+          La relación entre distopía e inteligencia artificial como herramienta narrativa en el falso documental
+        </span>
+      </div>
+
+      <!-- PREGUNTA PROBLEMA -->
+      <div style="border-bottom:1px solid var(--border); padding:16px 24px;">
+        <div style="font-family:var(--font-title);font-size:10px;color:var(--red);letter-spacing:0.2em;margin-bottom:12px;">PREGUNTA_PROBLEMA //</div>
+        <div style="font-family:var(--font-title);font-size:15px;color:var(--white-dirty);letter-spacing:0.05em;line-height:1.7;padding-left:16px;border-left:2px solid var(--red);">
+          ¿Cómo se expresa la relación entre distopía e inteligencia artificial, mediante la subversión a lo factual?
+        </div>
+      </div>
+
+      <!-- OBJETIVO GENERAL -->
+      <div style="border-bottom:1px solid var(--border); padding:16px 24px;">
+        <div style="font-family:var(--font-title);font-size:10px;color:var(--green-dim);letter-spacing:0.2em;margin-bottom:12px;">OBJETIVO_GENERAL //</div>
+        <div style="font-family:var(--font-title);font-size:13px;color:var(--gray-light);letter-spacing:0.05em;line-height:1.7;padding-left:16px;border-left:2px solid var(--green-dark);">
+          Crear la concepción inicial de un falso documental centrado en la relación distopía y algoritmos de aprendizaje autónomos.
+        </div>
+      </div>
+
+      <!-- OBJETIVOS ESPECÍFICOS -->
+      <div style="padding:16px 24px;">
+        <div style="font-family:var(--font-title);font-size:10px;color:var(--green-dim);letter-spacing:0.2em;margin-bottom:16px;">OBJETIVOS_ESPECÍFICOS //</div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+
+          <div style="display:flex;gap:14px;align-items:flex-start;">
+            <span style="font-family:var(--font-title);font-size:10px;color:var(--green-dark);letter-spacing:0.15em;flex-shrink:0;margin-top:2px;">OE_01</span>
+            <p style="font-family:var(--font-title);font-size:12px;color:var(--gray-light);letter-spacing:0.04em;line-height:1.7;border-left:1px solid var(--border);padding-left:14px;">
+              Elaborar un guion literario para un falso documental sobre un futuro distópico e inteligencia artificial, incluyendo el desarrollo detallado de personajes, escenarios, diálogos, descripciones de escenas y la trama general.
+            </p>
+          </div>
+
+          <div style="display:flex;gap:14px;align-items:flex-start;">
+            <span style="font-family:var(--font-title);font-size:10px;color:var(--green-dark);letter-spacing:0.15em;flex-shrink:0;margin-top:2px;">OE_02</span>
+            <p style="font-family:var(--font-title);font-size:12px;color:var(--gray-light);letter-spacing:0.04em;line-height:1.7;border-left:1px solid var(--border);padding-left:14px;">
+              Estructurar un guion técnico para la realización de un falso documental sobre un futuro distópico e inteligencia artificial, incorporando la planificación de tomas, ángulos de cámara, movimientos, efectos de sonido, iluminación, música, transiciones y anotaciones técnicas necesarias para la producción.
+            </p>
+          </div>
+
+          <div style="display:flex;gap:14px;align-items:flex-start;">
+            <span style="font-family:var(--font-title);font-size:10px;color:var(--green-dark);letter-spacing:0.15em;flex-shrink:0;margin-top:2px;">OE_03</span>
+            <p style="font-family:var(--font-title);font-size:12px;color:var(--gray-light);letter-spacing:0.04em;line-height:1.7;border-left:1px solid var(--border);padding-left:14px;">
+              Producir un adelanto (teaser) del falso documental sobre un futuro distópico e inteligencia artificial, que muestre una selección de escenas clave, efectos visuales y sonoros, y que sirva para captar la atención del público y promover el proyecto.
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+    <!-- FIN BLOQUE ACADÉMICO -->
+    <div class="docs-grid">
+      <div class="doc-card">
+        <div class="doc-type">ARCHIVO_01 // GUION LITERARIO</div>
+        <div class="doc-title">DEEP404 — GUION LITERARIO</div>
+        <div class="doc-desc">
+          Desarrollo completo de personajes, escenarios, diálogos y descripción de escenas.
+          La narrativa del falso documental desde la perspectiva creativa.
+        </div>
+        <a href="https://docs.google.com/document/d/1qrSjGc2dk9bsp1xshQdyqp-zeMRJMm7Zg5JVSBVmr18/edit?usp=sharing" class="doc-link" target="_blank" rel="noopener">ACCEDER AL DOCUMENTO &rarr;</a>
+      </div>
+      <div class="doc-card">
+        <div class="doc-type">ARCHIVO_02 // GUION TÉCNICO</div>
+        <div class="doc-title">DEEP404 — GUION TÉCNICO</div>
+        <div class="doc-desc">
+          Planificación de tomas, ángulos de cámara, movimientos, efectos de sonido,
+          iluminación, música y transiciones para la producción.
+        </div>
+        <!-- Reemplaza el href con el enlace del guion técnico -->
+        <a href="https://docs.google.com/document/d/1e4cfQ-gJQlq_P3vIXHmkcQt3hq5EHBXMBp2EH6BgI9A/edit?usp=sharing" class="doc-link" target="_blank">ACCEDER AL DOCUMENTO &rarr;</a>
+      </div>
+      <div class="doc-card">
+        <div class="doc-type">ARCHIVO_03 // STORYBOARD</div>
+        <div class="doc-title">DEEP404 — STORYBOARD</div>
+        <div class="doc-desc">
+          Planificación visual escena por escena. Secuencia de imágenes que representa
+          el flujo narrativo y visual del teaser.
+        </div>
+        <!-- Reemplaza el href con el enlace del storyboard -->
+        <a href="https://drive.google.com/file/d/1O5hMOvkhAwy-DUvd1yj_KMrEGQ2eIw4S/view?usp=sharing" class="doc-link" target="_blank">ACCEDER AL DOCUMENTO &rarr;</a>
+      </div>
+      <div class="doc-card">
+        <div class="doc-type">ARCHIVO_04 // TRABAJO DE GRADO</div>
+        <div class="doc-title">DOCUMENTO ACADÉMICO COMPLETO</div>
+        <div class="doc-desc">
+          Preconcepción completa del falso documental. Marco conceptual, metodología,
+          análisis y resultados. Universidad Distrital Francisco José de Caldas, 2026.
+        </div>
+        <!-- Reemplaza el href con el enlace del trabajo de grado -->
+        <a href="https://docs.google.com/document/d/1Yv6yUGMatW1nxEY8wql6mxs1KJO3gHPy/edit?usp=sharing&ouid=106202010782236644222&rtpof=true&sd=true" class="doc-link" target="_blank">ACCEDER AL DOCUMENTO &rarr;</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROGRAMAS -->
+<section id="programas">
+  <div class="section-header">
+    <span class="section-num">04 //</span>
+    <span class="section-title">PROGRAMAS — ARTEFACTOS DEL SISTEMA</span>
+  </div>
+  <div class="section-body">
+    <div class="prog-intro">
+      Dentro del universo de DEEP404, los algoritmos no solo controlan los medios.
+      También infiltran los dispositivos. Los siguientes programas son artefactos de esa infiltración:
+      interfaces que simulan ser algo que no son. <strong>Código Python. Doble clic. El sistema se activa.</strong>
+    </div>
+
+    <div class="prog-grid">
+
+      <!-- PROGRAMA 1: ANDROMEDA -->
+      <div class="prog-card">
+        <div class="prog-card-header">
+          <div class="prog-icon" style="width:64px;height:64px;border:1px solid var(--green-dark);background:#000;overflow:hidden;padding:0;">
+            <img src="data:image/png;base64,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" style="width:100%;height:100%;object-fit:cover;image-rendering:pixelated;" alt="ANDROMEDA — ícono gato"/>
+          </div>
+          <div class="prog-header-text">
+            <div class="prog-type">PROGRAMA_01 // SIMULADOR DE IA</div>
+            <div class="prog-name">ANDROMEDA</div>
+          </div>
+        </div>
+        <div class="prog-body">
+          <div class="prog-desc">
+            Interfaz de chat que simula ser un sistema de inteligencia artificial institucional.
+            Al ejecutarlo, despliega una ventana con logo propio y acceso a un chat interactivo —
+            el mismo tipo de interfaz que, en el universo de DEEP404, los algoritmos usan
+            para comunicarse con la población.
+          </div>
+          <div class="prog-behavior">
+            <div class="step"><span class="step-num">01.</span><span class="step-txt">Usuario hace doble clic en el ejecutable</span></div>
+            <div class="step"><span class="step-num">02.</span><span class="step-txt green">Abre ventana con logo ANDROMEDA</span></div>
+            <div class="step"><span class="step-num">03.</span><span class="step-txt green">Carga interfaz de chat tipo IA institucional</span></div>
+            <div class="step"><span class="step-num">04.</span><span class="step-txt">Sistema responde. El usuario interactúa.</span></div>
+          </div>
+          <div class="prog-specs">
+            <div class="prog-spec-row"><span class="prog-spec-key">LENGUAJE</span><span class="prog-spec-val">Python 3.x</span></div>
+            <div class="prog-spec-row"><span class="prog-spec-key">TIPO</span><span class="prog-spec-val">Simulador de interfaz IA / Chat</span></div>
+            <div class="prog-spec-row"><span class="prog-spec-key">EJECUCIÓN</span><span class="prog-spec-val">Doble clic — .py / .exe</span></div>
+            <div class="prog-spec-row"><span class="prog-spec-key">REPOSITORIO</span><span class="prog-spec-val">Google Drive</span></div>
+          </div>
+        </div>
+        <div class="prog-footer">
+          <!-- Reemplaza el href con tu URL de GitHub cuando lo subas -->
+          <a href="https://drive.google.com/file/d/1ZOlAFnv3xj0ewggxGMiOKw8m_XYbKbNu/view?usp=sharing" class="prog-btn" target="_blank" rel="noopener">&#8594; DESCARGAR ARCHIVO</a>
+          <span class="prog-status pending">// EN CORRECCIÓN</span>
+        </div>
+      </div>
+
+      <!-- PROGRAMA 2: VIRUS -->
+      <div class="prog-card">
+        <div class="prog-card-header">
+          <div class="prog-icon virus">&#9888;</div>
+          <div class="prog-header-text">
+            <div class="prog-type virus-type">PROGRAMA_02 // SIMULADOR DE INTRUSIÓN</div>
+            <div class="prog-name">ARCHIVO_INFECTADO.EXE</div>
+          </div>
+        </div>
+        <div class="prog-body">
+          <div class="prog-desc">
+            Se presenta como un archivo de video inofensivo. Al ejecutarlo, despliega un video
+            sobre el futuro distópico de Bogotá. Al terminar la reproducción, el programa
+            se cierra automáticamente y abre el foro de Reddit donde reside la comunidad
+            del proyecto — simulando ser una intrusión real del sistema.
+          </div>
+          <div class="prog-behavior">
+            <div class="step"><span class="step-num">01.</span><span class="step-txt">Usuario hace doble clic — icono de video, parece normal</span></div>
+            <div class="step"><span class="step-num">02.</span><span class="step-txt red">Se reproduce video: futuro distópico en Bogotá</span></div>
+            <div class="step"><span class="step-num">03.</span><span class="step-txt red">Video termina — programa se cierra automáticamente</span></div>
+            <div class="step"><span class="step-num">04.</span><span class="step-txt red">Se abre el foro de Reddit. El sistema ya actuó.</span></div>
+          </div>
+          <div class="prog-specs">
+            <div class="prog-spec-row"><span class="prog-spec-key">LENGUAJE</span><span class="prog-spec-val">Python 3.x</span></div>
+            <div class="prog-spec-row"><span class="prog-spec-key">TIPO</span><span class="prog-spec-val">Reproductor + redirección automática</span></div>
+            <div class="prog-spec-row red"><span class="prog-spec-key red">ADVERTENCIA</span><span class="prog-spec-val" style="color:var(--red)">Simulación — no es malware real</span></div>
+            <div class="prog-spec-row"><span class="prog-spec-key">REPOSITORIO</span><span class="prog-spec-val">Google Drive</span></div>
+          </div>
+        </div>
+        <div class="prog-footer">
+          <!-- Reemplaza el href con tu URL de GitHub cuando lo subas -->
+          <a href="https://drive.google.com/file/d/1zvCoyQfdMKKs5HBAxNFP2Pr5RJ4ufCBj/view?usp=sharing" class="prog-btn danger" target="_blank" rel="noopener">&#8594; DESCARGAR ARCHIVO</a>
+          <span class="prog-status pending">// EN CORRECCIÓN</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- REDDIT STRIP -->
+    <div style="font-family:var(--font-title);font-size:10px;color:var(--green-dim);letter-spacing:0.2em;margin-bottom:12px;">
+      // COMUNIDAD — FORO OFICIAL
+    </div>
+    <!-- Reemplaza el href con la URL de tu foro de Reddit -->
+    <a href="https://www.reddit.com/r/BogoDystopic/comments/1rfts3l/con_el_avance_de_la_ia_estoy_muy_preocupado_sobre/" class="reddit-strip" target="_blank" rel="noopener">
+      <div class="reddit-icon">r/</div>
+      <div class="reddit-text">
+        <div class="reddit-label">FORO OFICIAL // REDDIT</div>
+        <div class="reddit-title">DEEP404 — Comunidad y archivo del proyecto</div>
+        <div class="reddit-desc">
+          Documentación extendida, discusión, contexto del universo distópico y material adicional.
+          El programa ARCHIVO_INFECTADO.EXE redirige automáticamente a este espacio.
+        </div>
+      </div>
+      <div class="reddit-arrow">&#8594;</div>
+    </a>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-brand">DEEP404</span>
+  <span>SISTEMA DE ARCHIVO DIGITAL &nbsp;|&nbsp; UNIVERSIDAD DISTRITAL FRANCISCO JOSÉ DE CALDAS &nbsp;|&nbsp; 2026</span>
+  <span>J.C. MAYORGA TRIANA</span>
+</footer>
+
+<!-- VIDEO MODAL -->
+<div id="modal-overlay" onclick="closeModal(event)">
+  <div id="modal-box">
+    <div id="modal-header">
+      <span id="modal-label">REPRODUCIENDO REGISTRO</span>
+      <button id="modal-close" onclick="closeModal()">[ CERRAR_X ]</button>
+    </div>
+    <div id="modal-video-wrap">
+      <div id="modal-placeholder">
+        <span>&#9654;</span>
+        <span id="modal-instruction">https://drive.google.com/file/d/1R1B1zBWg7Ff-T99-rcxh_PZrU30cSGA3/view?usp=sharing</span>
+        <div class="drive-url" id="modal-url"></div>
+      </div>
+      <iframe id="modal-iframe" src="about:blank" allow="autoplay; fullscreen" allowfullscreen style="display:none;"></iframe>
+    </div>
+    <div id="modal-info">
+      <div id="modal-name"></div>
+      <div id="modal-role"></div>
+      <a id="modal-fallback-btn" href="#" target="_blank" rel="noopener" style="display:none;margin-top:10px;color:var(--green);border:1px solid var(--green-dark);padding:5px 12px;font-family:var(--font-title);font-size:10px;letter-spacing:0.1em;text-decoration:none;background:transparent;">&#9654; ABRIR EN NUEVA PESTAÑA</a>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── TEASER ───────────────────────────────────────────────────────────────────
+// Pon el ID de tu video aquí. Solo uno de los dos:
+const teaser = {
+  driveId: "1R1B1zBWg7Ff-T99-rcxh_PZrU30cSGA3",  // ID de Google Drive
+  youtubeId: "",                                    // ID de YouTube (si usas YT en vez de Drive)
+  thumb: "https://drive.google.com/thumbnail?id=1IAoXK-AuzJN1yu_Ew3xxTr7CVqjW0AwD&sz=w800",
+};
+
+(function() {
+  const iframe = document.getElementById('teaser-iframe');
+  const placeholder = document.getElementById('teaser-placeholder');
+  const isMob = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  // Aplica miniatura si está definida
+  if (teaser.thumb) {
+    placeholder.style.backgroundImage = 'url("' + teaser.thumb+ '")';
+    placeholder.style.backgroundSize = 'cover';
+    placeholder.style.backgroundPosition = 'center';
+  }
+
+  function loadVideo() {
+    if (teaser.youtubeId) {
+      iframe.src = 'https://www.youtube.com/embed/' + teaser.youtubeId + '?autoplay=1';
+      iframe.style.display = 'block';
+      placeholder.style.display = 'none';
+    } else if (teaser.driveId && !isMob) {
+      iframe.src = 'https://drive.google.com/file/d/' + teaser.driveId + '/preview';
+      iframe.style.display = 'block';
+      placeholder.style.display = 'none';
+    } else if (teaser.driveId && isMob) {
+      window.open('https://drive.google.com/file/d/' + teaser.driveId + '/view', '_blank');
+    }
+  }
+
+  if (teaser.driveId || teaser.youtubeId) {
+    placeholder.style.cursor = 'pointer';
+    placeholder.addEventListener('click', loadVideo);
+  }
+})();
+
+// ─── DATOS DE ENTREVISTAS ─────────────────────────────────────────────────────
+// Edita este array con los datos reales de tus 24 entrevistados
+// driveId: el ID del archivo en Google Drive (parte de la URL después de /d/)
+// Si el video está en YouTube usa youtubeId en lugar de driveId
+const entrevistas = [
+  { num:"E_01", name:"Nataly Cook", role:"Compañera", tag:"UNIVERSIDAD", driveId:"1bDCWOpncno04K_W6mv4gezPM-wvaB_xx" },
+  { num:"E_02", name:"Jhon Puentes", role:"Compañero", tag:"UNIVERSIDAD",     driveId:"1bunFNdDfZvahMpXjR6MnO2-vEwvpbOnH" },
+  { num:"E_03", name:"Juan", role:"Compañero", tag:"UNIVERSIDAD",         driveId:"1TwZZqWDN9hLOpWZbOC2E9AXOxY5ZeJ7T" },
+  { num:"E_04", name:"Angel Lozada", role:"Compañero", tag:"UNIVERSIDAD",   driveId:"15MTPqWQr1jRlKJdrZAhpf1MMVpf0sXpv" },
+  { num:"E_05", name:"Sergio Vargas", role:"Profesor", tag:"UNIVERSIDAD", driveId:"1Zn3hFBJIEO9sMpQfrcv4R9-uKl5Ly54u" },
+  { num:"E_06", name:"Juan José", role:"Compañero", tag:"UNIVERSIDAD", driveId:"1K1W4yvSAQv1DNJwAnXW2S7TvRJIkGiDH" },
+  { num:"E_07", name:"Sofia Barragan", role:"Compañero", tag:"UNIVERSIDAD",   driveId:"1qrzXbu01d-I6Z_BmSHxOnN12bT1ksW-J" },
+  { num:"E_08", name:"Erick Quitian & Dairo Quintero", role:"Compañeros", tag:"UNIVERSIDAD",         driveId:"1cdjUZaBBoEzDgpx9fIDPR9JhwsbInQy0" },
+  { num:"E_09", name:"Felipe Aponte & Lina Ramos", role:"Compañeros",  tag:"UNIVERSIDAD", driveId:"1bn8WwUiVQcB_grLrLDEmaJtqfVIBRjGO" },
+  { num:"E_10", name:"Alexander Martinez",          role:"Compañero",   tag:"UNIVERSIDAD", driveId:"1mvxuhumaQ3Z2EzYlmE684sHbry3LLB2x" },
+  { num:"E_11", name:"Vanessa Montiel",             role:"Compañero",   tag:"UNIVERSIDAD", driveId:"1kyp3AWfz1utKV0Ko-D9YTW3FUVvjTqPb" },
+  { num:"E_12", name:"Luli Sanchez",                role:"Compañera",   tag:"UNIVERSIDAD", driveId:"1vCto_Yw7vwrw6OceJWZASGDsD3fgTm0O" },
+  { num:"E_13", name:"Jeffry Lopez",                role:"Compañero",   tag:"UNIVERSIDAD", driveId:"18ctruJ5H50WpUFmenem9poz9gQtALGKy" },
+  { num:"E_14", name:"Valentina Agudelo",           role:"Estudiante",  tag:"UNIVERSIDAD", driveId:"1Cbeau7iGASdikbptUVAUjxPc5lMHMjl3" },
+  { num:"E_15", name:"Juan Esteban Velez",          role:"Estudiante",  tag:"UNIVERSIDAD", driveId:"1ffzK7_iXwvZxYMYX5DrOG9rXsKqcWXbD" },
+  { num:"E_16", name:"Andrea Lizaraso",             role:"Estudiante",  tag:"UNIVERSIDAD", driveId:"1QcGyTPzuwmzVwecix4n9t0LB4dfKWjiv" },
+  { num:"E_17", name:"Cristian Rojas",              role:"Estudiante",  tag:"UNIVERSIDAD", driveId:"1BjBoy_0vSFuOvgsyl-HAtDTjtOJZuhc2" },
+  { num:"E_18", name:"Camila León",                 role:"Compañera",   tag:"UNIVERSIDAD", driveId:"12GpxD33hOdfeWs_9F8D7vLuvZ9J4cnWL" },
+  { num:"E_19", name:"Nicolas Parga",               role:"Estudiante",  tag:"UNIVERSIDAD", driveId:"1YCcMO5x9orBaZ5zrxH8g1Y9IRAr1ofJ7" },
+  { num:"E_20", name:"Jissel C. Otalora",           role:"Estudiante",  tag:"UNIVERSIDAD", driveId:"1lqj4B_PEHtkfdM3fhElS-dT3itf-EA8y" },
+  { num:"E_21", name:"Tatiana Bejarano",            role:"Estudiante",  tag:"UNIVERSIDAD", driveId:"1BCJvoRbMk6ThuNpfogf9-LwmwYbzHfq2" },
+  { num:"E_22", name:"Romulo Gallego",              role:"Profesor",    tag:"UNIVERSIDAD", driveId:"1iAxW_7TzT6hx1NqpXbVqyHKcfj7L25pc" },
+  { num:"E_23", name:"Daniela Ortega",              role:"Estudiante",  tag:"UNIVERSIDAD", driveId:"10SBhGv3TdXY3ykn41TmF_2lLE2l0xawQ" },
+  { num:"E_24", name:"Juan Carlos Figueroa",        role:"Padre",       tag:"UNIVERSIDAD", driveId:"1MNMdxfejKrEQtwArFd7rP_5OriyoLa2j" },
+];
+
+// ─── RENDER TARJETAS ──────────────────────────────────────────────────────────
+const grid = document.getElementById('grid');
+entrevistas.forEach((e, i) => {
+  const card = document.createElement('div');
+  card.className = 'interview-card';
+  card.dataset.tag = e.tag;
+  const thumbUrl = e.thumb
+    ? e.thumb
+    : e.youtubeId
+      ? 'https://img.youtube.com/vi/' + e.youtubeId + '/hqdefault.jpg'
+      : e.driveId
+        ? 'https://drive.google.com/thumbnail?id=' + e.driveId + '&sz=w400'
+        : '';
+  const thumbStyle = thumbUrl ? ' style="background-image:url(\'' + thumbUrl + '\')"' : '';
+  const thumbClass = thumbUrl ? ' has-thumb' : '';
+  card.innerHTML = `
+    <div class="card-thumb">
+      <div class="card-thumb-inner${thumbClass}"${thumbStyle}>404</div>
+      <div class="card-play"><span>&#9654;</span></div>
+    </div>
+    <div class="card-body">
+      <div class="card-num">${e.num}</div>
+      <div class="card-name">${e.name}</div>
+      <div class="card-role">${e.role}</div>
+      <div class="card-tag">${e.tag}</div>
+    </div>`;
+  card.addEventListener('click', () => openModal(e));
+  grid.appendChild(card);
+});
+
+// ─── MODAL ────────────────────────────────────────────────────────────────────
+function isMobile() {
+  return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+}
+
+function openModal(e) {
+  document.getElementById('modal-overlay').classList.add('open');
+  document.getElementById('modal-name').textContent = e.name;
+  document.getElementById('modal-role').textContent = e.role + ' // ' + e.num;
+  document.getElementById('modal-label').textContent = 'REPRODUCIENDO — ' + e.num;
+  const iframe = document.getElementById('modal-iframe');
+  const placeholder = document.getElementById('modal-placeholder');
+  const urlEl = document.getElementById('modal-url');
+  const instrEl = document.getElementById('modal-instruction');
+  const fallbackBtn = document.getElementById('modal-fallback-btn');
+
+  fallbackBtn.style.display = 'none';
+  instrEl.textContent = 'REEMPLAZAR CON URL DE GOOGLE DRIVE';
+
+  if (e.driveId && isMobile()) {
+    // Android/iOS bloquean el iframe de Drive — mostramos botón directo
+    const viewUrl = 'https://drive.google.com/file/d/' + e.driveId + '/view';
+    iframe.src = 'about:blank';
+    iframe.style.display = 'none';
+    placeholder.style.display = 'flex';
+    instrEl.textContent = 'TAP PARA VER VIDEO';
+    urlEl.innerHTML = '<a href="' + viewUrl + '" target="_blank" rel="noopener" style="color:var(--green);text-decoration:none;font-size:13px;border:1px solid var(--green);padding:8px 18px;display:inline-block;margin-top:8px;">&#9654;&nbsp;ABRIR VIDEO</a>';
+  } else if (e.driveId) {
+    const viewUrl = 'https://drive.google.com/file/d/' + e.driveId + '/view';
+    iframe.src = 'https://drive.google.com/file/d/' + e.driveId + '/preview';
+    iframe.style.display = 'block';
+    placeholder.style.display = 'none';
+    fallbackBtn.href = viewUrl;
+    fallbackBtn.style.display = 'block';
+  } else if (e.youtubeId) {
+    const ytUrl = 'https://www.youtube.com/watch?v=' + e.youtubeId;
+    iframe.src = 'https://www.youtube.com/embed/' + e.youtubeId + '?autoplay=1';
+    iframe.style.display = 'block';
+    placeholder.style.display = 'none';
+    fallbackBtn.href = ytUrl;
+    fallbackBtn.style.display = 'block';
+  } else {
+    iframe.src = 'about:blank';
+    iframe.style.display = 'none';
+    placeholder.style.display = 'flex';
+    urlEl.textContent = 'SIN URL ASIGNADA — agrega driveId o youtubeId para ' + e.num;
+  }
+}
+
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('modal-overlay') && e.target !== document.getElementById('modal-close')) return;
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.getElementById('modal-iframe').src = 'about:blank';
+}
+
+// ─── ACCESO RESTRINGIDO ───────────────────────────────────────────────────────
+function checkAccess() {
+  const val = document.getElementById('access-input').value.toLowerCase().trim();
+  const errEl = document.getElementById('access-error');
+  // Contraseña: "deep404" — puedes cambiarla aquí
+  if (val === 'deep404') {
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('restricted-content').classList.add('open');
+  } else {
+    errEl.textContent = '// ERROR: CÓDIGO INVÁLIDO — INTENTO REGISTRADO';
+    document.getElementById('access-input').value = '';
+    setTimeout(() => errEl.textContent = '', 3000);
+  }
+}
+document.getElementById('access-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') checkAccess();
+});
+
+// ─── BOOT SCREEN ──────────────────────────────────────────────────────────────
+(function() {
+  const fill = document.getElementById('boot-bar-fill');
+  const pct  = document.getElementById('boot-pct');
+  let p = 0;
+  const iv = setInterval(() => {
+    p += Math.random() * 8 + 2;
+    if (p >= 100) { p = 100; clearInterval(iv); }
+    fill.style.width = p + '%';
+    pct.textContent = Math.floor(p);
+    if (p >= 100) setTimeout(() => document.getElementById('boot').classList.add('hide'), 600);
+  }, 80);
+})();
+</script>
+</body>
+</html>
